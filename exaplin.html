@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ELI5 — Explain Like I'm Five</title>
+
+  <!-- Cormorant Garamond: editorial serif (like the reference site) -->
+  <!-- Jost: clean modern body font -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* =============================================
+       1. DESIGN TOKENS
+       Inspired by the Doria Pamphilj palette:
+       deep charcoal bg, warm cream text, gold accent
+    ============================================= */
+    :root {
+      --bg:         #0e0d0b;   /* near-black warm */
+      --bg2:        #171511;   /* slightly lighter panels */
+      --bg3:        #1f1c17;   /* card surfaces */
+      --border:     #2e2a22;   /* subtle warm border */
+      --gold:       #c9a96e;   /* warm gold accent */
+      --gold-dim:   #7a5f38;   /* dimmer gold */
+      --cream:      #e8dfc8;   /* warm cream — main text */
+      --cream-dim:  #a09070;   /* muted cream */
+      --cream-low:  #4a4438;   /* very muted */
+      --correct:    #5a7a5a;
+      --correct-bg: #141e14;
+      --wrong:      #7a4a4a;
+      --wrong-bg:   #1e1414;
+    }
+
+    /* =============================================
+       2. RESET & BASE
+    ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--cream-dim);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* Subtle noise grain overlay for depth */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 9999; opacity: 0.4;
+    }
+
+    /* =============================================
+       3. TYPOGRAPHY
+    ============================================= */
+    h1, h2, h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      color: var(--cream);
+      line-height: 1.1;
+    }
+
+    /* Decorative asterisk / ornament */
+    .ornament { color: var(--gold); font-size: 18px; }
+
+    /* Section label — small caps style */
+    .label {
+      font-family: 'Jost', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+    }
+
+    /* =============================================
+       4. LAYOUT
+    ============================================= */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 28px;
+    }
+
+    /* =============================================
+       5. HEADER / HERO
+    ============================================= */
+    header {
+      padding: 60px 0 48px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    /* Decorative corner lines in header */
+    header::before, header::after {
+      content: '';
+      position: absolute;
+      width: 80px; height: 80px;
+      border-color: var(--border);
+      border-style: solid;
+      top: 28px;
+    }
+    header::before { left: 28px;  border-width: 1px 0 0 1px; }
+    header::after  { right: 28px; border-width: 1px 1px 0 0; }
+
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .hero-label span { display: block; width: 40px; height: 1px; background: var(--gold-dim); }
+
+    .hero-title {
+      font-size: clamp(48px, 8vw, 88px);
+      letter-spacing: -0.01em;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-sub {
+      margin-top: 16px;
+      font-size: 14px;
+      color: var(--cream-low);
+      letter-spacing: 0.05em;
+    }
+
+    /* =============================================
+       6. INPUT — ARCH STYLED
+    ============================================= */
+    .input-section {
+      padding: 56px 0;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .input-wrap {
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    /* The arch shape above the input */
+    .arch-frame {
+      width: 100%;
+      position: relative;
+    }
+
+    /* SVG arch border around the input */
+    .arch-frame svg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+
+    #conceptInput {
+      width: 100%;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 18px 22px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      font-weight: 300;
+      color: var(--cream);
+      outline: none;
+      text-align: center;
+      transition: border-color 0.3s;
+      letter-spacing: 0.02em;
+    }
+    #conceptInput:focus { border-color: var(--gold-dim); }
+    #conceptInput::placeholder { color: var(--cream-low); }
+
+    #generateBtn {
+      background: transparent;
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+      font-family: 'Jost', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 14px 36px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-radius: 2px;
+    }
+    #generateBtn:hover:not(:disabled) {
+      background: var(--gold);
+      color: var(--bg);
+    }
+    #generateBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* =============================================
+       7. LOADING
+    ============================================= */
+    #loadingState {
+      display: none;
+      text-align: center;
+      padding: 48px 0;
+    }
+
+    /* Spinning ornament loader */
+    .loader-ring {
+      display: inline-block;
+      width: 40px; height: 40px;
+      border: 1px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1.2s linear infinite;
+      margin-bottom: 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-style: italic;
+      color: var(--cream-dim);
+    }
+
+    /* =============================================
+       8. RESULTS WRAPPER
+    ============================================= */
+    #results { display: none; }
+
+    /* Every result section gets a top border + padding */
+    .result-section {
+      padding: 56px 0;
+      border-bottom: 1px solid var(--border);
+      animation: fadeUp 0.5s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Section heading row */
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+    .section-head h2 { font-size: clamp(28px, 4vw, 42px); }
+    .section-head-line { flex: 1; height: 1px; background: var(--border); }
+
+    /* =============================================
+       9. PIXEL ART CANVAS
+    ============================================= */
+    /* Arch-shaped frame around canvas using clip-path */
+    .canvas-arch-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* The arch border — drawn with a pseudo element */
+    .canvas-arch-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border: 1px solid var(--border);
+      border-radius: 50% 50% 4px 4px / 30% 30% 4px 4px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    #pixelCanvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 50% 50% 4px 4px / 30% 30% 4px 4px;
+      background: var(--bg2);
+    }
+
+    .scene-desc {
+      text-align: center;
+      margin-top: 20px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 17px;
+      font-style: italic;
+      color: var(--cream-dim);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* =============================================
+       10. SUMMARY SECTION
+    ============================================= */
+    .summary-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 36px 40px;
+      position: relative;
+    }
+
+    /* Gold corner ornaments */
+    .summary-box::before, .summary-box::after {
+      content: '✦';
+      position: absolute;
+      color: var(--gold-dim);
+      font-size: 12px;
+    }
+    .summary-box::before { top: 14px; left: 18px; }
+    .summary-box::after  { bottom: 14px; right: 18px; }
+
+    #summaryText {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 19px;
+      font-weight: 300;
+      color: var(--cream-dim);
+      line-height: 1.8;
+    }
+
+    /* =============================================
+       11. SWIPEABLE TABS (Flashcards / Quiz / MCQ)
+       Three tabs share one tab-bar
+    ============================================= */
+    .tabs-bar {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 36px;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--cream-low);
+      font-family: 'Jost', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      cursor: pointer;
+      transition: all 0.25s;
+      margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--cream-dim); }
+    .tab-btn.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+    }
+
+    /* Tab panels */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* =============================================
+       12. FLASHCARDS
+    ============================================= */
+    /* Arch-shaped card */
+    .flash-card-wrap {
+      perspective: 1200px;
+      width: 100%;
+      max-width: 500px;
+      height: 240px;
+      margin: 0 auto 24px;
+      cursor: pointer;
+    }
+
+    .flash-inner {
+      position: relative;
+      width: 100%; height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4,0,0.2,1);
+    }
+    .flash-inner.flipped { transform: rotateY(180deg); }
+
+    .flash-front, .flash-back {
+      position: absolute; inset: 0;
+      backface-visibility: hidden;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 50% 50% 6px 6px / 14% 14% 6px 6px; /* arch shape */
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px 36px; text-align: center;
+    }
+    .flash-back {
+      transform: rotateY(180deg);
+      border-color: var(--gold-dim);
+      background: var(--bg3);
+    }
+
+    .flash-front h3 {
+      font-size: 26px;
+      color: var(--cream);
+    }
+    .flash-front .tap-hint {
+      margin-top: 10px;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cream-low);
+    }
+    .flash-back p {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      color: var(--cream-dim);
+      line-height: 1.7;
+    }
+
+    /* Card nav */
+    .card-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 8px;
+    }
+    .nav-arrow {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--cream-dim);
+      width: 38px; height: 38px;
+      border-radius: 2px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-arrow:hover { border-color: var(--gold-dim); color: var(--gold); }
+    .card-count { font-size: 12px; color: var(--cream-low); letter-spacing: 0.08em; }
+
+    /* =============================================
+       13. MCQ QUIZ
+    ============================================= */
+    .questions-list { display: flex; flex-direction: column; gap: 32px; }
+
+    .q-block { }
+
+    .q-num {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 6px;
+    }
+
+    .q-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      color: var(--cream);
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+
+    /* 2-column grid of options */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .opt-btn {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--cream-dim);
+      border-radius: 3px;
+      padding: 13px 16px;
+      font-family: 'Jost', sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      line-height: 1.45;
+    }
+    .opt-btn:hover:not(:disabled) {
+      border-color: var(--gold-dim);
+      color: var(--cream);
+    }
+    .opt-btn.correct {
+      background: var(--correct-bg);
+      border-color: var(--correct);
+      color: #8ab88a;
+    }
+    .opt-btn.wrong {
+      background: var(--wrong-bg);
+      border-color: var(--wrong);
+      color: #b88a8a;
+    }
+    .opt-btn:disabled { cursor: default; }
+
+    /* =============================================
+       14. SCORE SCREEN
+    ============================================= */
+    #scoreScreen {
+      display: none;
+      text-align: center;
+      padding: 40px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-top: 32px;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .score-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 72px;
+      font-weight: 300;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .score-denom {
+      font-size: 32px;
+      color: var(--cream-low);
+    }
+    .score-msg {
+      margin-top: 12px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 19px;
+      font-style: italic;
+      color: var(--cream-dim);
+    }
+
+    /* =============================================
+       15. FOOTER
+    ============================================= */
+    footer {
+      text-align: center;
+      padding: 36px 0;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--cream-low);
+    }
+
+    /* =============================================
+       16. RESPONSIVE
+    ============================================= */
+    @media (max-width: 540px) {
+      .options-grid { grid-template-columns: 1fr; }
+      .flash-card-wrap { height: 200px; }
+      .tab-btn { padding: 12px 14px; font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================
+     HEADER
+============================================ -->
+<header>
+  <div class="container">
+    <div class="hero-label">
+      <span></span>
+      <p class="label">AI-Powered Learning</p>
+      <span></span>
+    </div>
+    <h1 class="hero-title">
+      Explain Like<br>I'm <em>Five</em>
+    </h1>
+    <p class="hero-sub">Type any concept. Get art, a summary, flashcards & a quiz.</p>
+  </div>
+</header>
+
+
+<!-- ============================================
+     INPUT SECTION
+============================================ -->
+<section class="input-section">
+  <div class="container">
+    <div class="input-wrap" style="margin: 0 auto;">
+      <p class="label" style="margin-bottom:8px;">Enter a concept</p>
+      <input
+        type="text"
+        id="conceptInput"
+        placeholder="e.g. gravity, photosynthesis, democracy…"
+        maxlength="60"
+      />
+      <button id="generateBtn" onclick="generate()">
+        ✦ &nbsp; Generate Lesson
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================
+     LOADING STATE
+============================================ -->
+<div id="loadingState">
+  <div class="container" style="text-align:center; padding: 48px 0;">
+    <div class="loader-ring"></div>
+    <p class="loading-text">Composing your lesson…</p>
+  </div>
+</div>
+
+
+<!-- ============================================
+     RESULTS
+============================================ -->
+<div id="results">
+  <div class="container">
+
+    <!-- 1. PIXEL ART SCENE ─────────────────── -->
+    <section class="result-section" style="animation-delay:0s">
+      <div class="section-head">
+        <span class="ornament">✦</span>
+        <h2>Visual Scene</h2>
+        <div class="section-head-line"></div>
+      </div>
+
+      <div class="canvas-arch-wrap">
+        <canvas id="pixelCanvas" width="680" height="320"></canvas>
+      </div>
+      <p class="scene-desc" id="sceneDesc"></p>
+    </section>
+
+    <!-- 2. SUMMARY ─────────────────────────── -->
+    <section class="result-section" style="animation-delay:0.1s">
+      <div class="section-head">
+        <span class="ornament">✦</span>
+        <h2>Summary</h2>
+        <div class="section-head-line"></div>
+      </div>
+
+      <div class="summary-box">
+        <p id="summaryText"></p>
+      </div>
+    </section>
+
+    <!-- 3. FLASHCARDS + QUIZ TABS ─────────── -->
+    <section class="result-section" style="animation-delay:0.2s">
+      <div class="section-head">
+        <span class="ornament">✦</span>
+        <h2>Study &amp; Test</h2>
+        <div class="section-head-line"></div>
+      </div>
+
+      <!-- Tab bar -->
+      <div class="tabs-bar">
+        <button class="tab-btn active" onclick="switchTab('flashcards', this)">Flashcards</button>
+        <button class="tab-btn"        onclick="switchTab('quiz', this)">Quiz</button>
+      </div>
+
+      <!-- FLASHCARDS panel -->
+      <div id="tab-flashcards" class="tab-panel active">
+        <!-- The arch-shaped flippable card -->
+        <div class="flash-card-wrap" onclick="flipCard()">
+          <div class="flash-inner" id="flashInner">
+            <div class="flash-front">
+              <h3 id="cardTerm">—</h3>
+              <p class="tap-hint">Tap to reveal</p>
+            </div>
+            <div class="flash-back">
+              <p id="cardExpl">—</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-nav">
+          <button class="nav-arrow" onclick="prevCard()">←</button>
+          <span class="card-count" id="cardCount">1 / 5</span>
+          <button class="nav-arrow" onclick="nextCard()">→</button>
+        </div>
+      </div>
+
+      <!-- QUIZ panel -->
+      <div id="tab-quiz" class="tab-panel">
+        <div class="questions-list" id="questionsList"></div>
+        <div id="scoreScreen">
+          <p class="label" style="margin-bottom:10px;">Final Score</p>
+          <p class="score-num" id="scoreNum">0<span class="score-denom">/5</span></p>
+          <p class="score-msg" id="scoreMsg"></p>
+        </div>
+      </div>
+
+    </section>
+
+  </div><!-- /container -->
+</div><!-- /results -->
+
+
+<!-- ============================================
+     FOOTER
+============================================ -->
+<footer>
+  <p class="label">ELI5 — Explain Like I'm Five &nbsp;✦&nbsp; Powered by Claude AI</p>
+</footer>
+
+
+<!-- ============================================
+     JAVASCRIPT
+============================================ -->
+<script>
+
+  /* ─────────────────────────────────────────
+     STATE — Everything the app needs to track
+  ───────────────────────────────────────── */
+  let flashcards  = [];   // [{term, explanation}]
+  let questions   = [];   // [{question, options[], correct}]
+  let cardIndex   = 0;    // Current flashcard (0–4)
+  let score       = 0;    // Quiz score
+  let answered    = 0;    // Questions answered so far
+  let choices     = {};   // {questionIndex: chosenOptionIndex}
+
+  /* ─────────────────────────────────────────
+     GENERATE — Main entry point
+  ───────────────────────────────────────── */
+  async function generate() {
+    const concept = document.getElementById('conceptInput').value.trim();
+    if (!concept) return;
+
+    // Reset state
+    score = 0; answered = 0; choices = {}; cardIndex = 0;
+    document.getElementById('scoreScreen').style.display = 'none';
+
+    // Show loading, hide old results
+    document.getElementById('generateBtn').disabled = true;
+    document.getElementById('loadingState').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+
+    try {
+      const data = await callClaude(concept);
+      populate(data, concept);
+      document.getElementById('results').style.display = 'block';
+    } catch (e) {
+      alert('Something went wrong — please try again.');
+      console.error(e);
+    } finally {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('generateBtn').disabled = false;
+    }
+  }
+
+  /* ─────────────────────────────────────────
+     CLAUDE API CALL
+     Returns parsed JSON object
+  ───────────────────────────────────────── */
+  async function callClaude(concept) {
+    const prompt = `You are an educational content generator. Topic: "${concept}".
+
+Return ONLY valid JSON (no markdown, no extra text):
+{
+  "sceneDescription": "One elegant sentence describing the pixel art scene",
+  "summary": "A warm, clear 3–4 sentence summary explaining the concept simply, like explaining to a curious 10-year-old. Be engaging and use an analogy.",
+  "scene": {
+    "bgColor": "#1a1814",
+    "objects": [
+      { "label": "name", "x": 0.3, "y": 0.5, "color": "#c9a96e", "size": 24, "shape": "circle" }
+    ]
+  },
+  "flashcards": [
+    { "term": "Key Term", "explanation": "Simple 1–2 sentence explanation." }
+  ],
+  "questions": [
+    { "question": "Question text?", "options": ["A) ...", "B) ...", "C) ...", "D) ..."], "correct": 0 }
+  ]
+}
+
+Rules:
+- scene.objects: 4–7 objects. x/y = 0 to 1 (fractions of canvas). shape = circle | square | triangle.
+- Use warm, muted earthy tones for object colors (golds, ambers, muted greens, warm blues). No neon.
+- scene.bgColor: dark warm color like #1a1814 or #0f1218
+- flashcards: exactly 5
+- questions: exactly 5. "correct" = index (0 to 3) of the right option.
+- Language: warm, simple, friendly. Avoid jargon.`;
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1200,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    // Remove any accidental markdown code fences before parsing
+    const raw = data.content[0].text.replace(/```json|```/g, '').trim();
+    return JSON.parse(raw);
+  }
+
+  /* ─────────────────────────────────────────
+     POPULATE — Fill all sections with data
+  ───────────────────────────────────────── */
+  function populate(data, concept) {
+    // Draw canvas scene
+    drawScene(data.scene, concept);
+    document.getElementById('sceneDesc').textContent = data.sceneDescription;
+
+    // Summary
+    document.getElementById('summaryText').textContent = data.summary;
+
+    // Flashcards
+    flashcards = data.flashcards;
+    showCard(0);
+
+    // Quiz
+    questions = data.questions;
+    buildQuiz();
+
+    // Reset to flashcards tab
+    switchTab('flashcards', document.querySelectorAll('.tab-btn')[0]);
+  }
+
+  /* ─────────────────────────────────────────
+     CANVAS — Draw the pixel art scene
+  ───────────────────────────────────────── */
+  function drawScene(scene, concept) {
+    const canvas = document.getElementById('pixelCanvas');
+    const ctx    = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+
+    // Background
+    ctx.fillStyle = scene.bgColor || '#1a1814';
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle dot grid texture
+    ctx.fillStyle = 'rgba(255,255,255,0.03)';
+    for (let x = 20; x < W; x += 28)
+      for (let y = 20; y < H; y += 28)
+        ctx.fillRect(x, y, 2, 2);
+
+    // Warm vignette edges
+    const vignette = ctx.createRadialGradient(W/2, H/2, H*0.2, W/2, H/2, H*0.8);
+    vignette.addColorStop(0, 'rgba(0,0,0,0)');
+    vignette.addColorStop(1, 'rgba(0,0,0,0.55)');
+    ctx.fillStyle = vignette;
+    ctx.fillRect(0, 0, W, H);
+
+    // Draw each object from the AI scene data
+    scene.objects.forEach(obj => {
+      const px = obj.x * W;
+      const py = obj.y * H;
+      const s  = Math.max(10, obj.size || 20);
+
+      // Draw a soft glow behind each shape
+      const glow = ctx.createRadialGradient(px, py, 0, px, py, s * 1.4);
+      glow.addColorStop(0, obj.color + '33');
+      glow.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow;
+      ctx.fillRect(px - s * 1.5, py - s * 1.5, s * 3, s * 3);
+
+      // Draw the shape itself (snapped to 4px grid for pixel art feel)
+      const snap = 4;
+      const sx = Math.round(px / snap) * snap;
+      const sy = Math.round(py / snap) * snap;
+      const ss = Math.round(s  / snap) * snap;
+
+      ctx.fillStyle = obj.color;
+
+      if (obj.shape === 'circle') {
+        // Chunky pixel circle
+        drawPixelCircle(ctx, sx, sy, ss);
+      } else if (obj.shape === 'triangle') {
+        drawPixelTriangle(ctx, sx, sy, ss);
+      } else {
+        // Square
+        ctx.fillRect(sx - ss/2, sy - ss/2, ss, ss);
+      }
+
+      // Small label under each shape
+      ctx.fillStyle = 'rgba(232, 223, 200, 0.5)';
+      ctx.font = '10px "Jost", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(obj.label.slice(0, 14), sx, sy + ss/2 + 14);
+    });
+
+    // Concept title top-left in gold
+    ctx.fillStyle = '#c9a96e';
+    ctx.font = '500 13px "Jost", sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(concept.toUpperCase(), 18, 22);
+  }
+
+  /* Draw a chunky circle using filled squares */
+  function drawPixelCircle(ctx, cx, cy, size) {
+    const r = size / 2, step = 4;
+    for (let dy = -r; dy <= r; dy += step)
+      for (let dx = -r; dx <= r; dx += step)
+        if (dx*dx + dy*dy <= r*r)
+          ctx.fillRect(cx + dx, cy + dy, step, step);
+  }
+
+  /* Draw a chunky triangle */
+  function drawPixelTriangle(ctx, cx, cy, size) {
+    const step = 4;
+    const rows = Math.round(size / step);
+    for (let row = 0; row < rows; row++) {
+      const w = (row + 1) * step;
+      ctx.fillRect(cx - w/2, cy - size/2 + row*step, w, step);
+    }
+  }
+
+  /* ─────────────────────────────────────────
+     FLASHCARD FUNCTIONS
+  ───────────────────────────────────────── */
+
+  // Display card at a given index
+  function showCard(i) {
+    const card = flashcards[i];
+    document.getElementById('cardTerm').textContent = card.term;
+    document.getElementById('cardExpl').textContent = card.explanation;
+    document.getElementById('cardCount').textContent = `${i + 1} / ${flashcards.length}`;
+    // Reset flip on navigation
+    document.getElementById('flashInner').classList.remove('flipped');
+  }
+
+  function flipCard() {
+    document.getElementById('flashInner').classList.toggle('flipped');
+  }
+
+  function nextCard() {
+    cardIndex = (cardIndex + 1) % flashcards.length;
+    showCard(cardIndex);
+  }
+
+  function prevCard() {
+    cardIndex = (cardIndex - 1 + flashcards.length) % flashcards.length;
+    showCard(cardIndex);
+  }
+
+  /* ─────────────────────────────────────────
+     QUIZ FUNCTIONS
+  ───────────────────────────────────────── */
+
+  // Build question blocks into the DOM
+  function buildQuiz() {
+    const container = document.getElementById('questionsList');
+    container.innerHTML = ''; // Clear old quiz
+
+    questions.forEach((q, qi) => {
+      // Question block
+      const block = document.createElement('div');
+      block.className = 'q-block';
+      block.innerHTML = `
+        <p class="q-num">Question ${qi + 1}</p>
+        <p class="q-text">${q.question}</p>
+        <div class="options-grid" id="opts-${qi}"></div>
+      `;
+      container.appendChild(block);
+
+      // Option buttons
+      const grid = block.querySelector(`#opts-${qi}`);
+      q.options.forEach((opt, oi) => {
+        const btn = document.createElement('button');
+        btn.className   = 'opt-btn';
+        btn.textContent = opt;
+        btn.onclick     = () => answerQuestion(qi, oi, q.correct);
+        grid.appendChild(btn);
+      });
+    });
+  }
+
+  // Handle an answer selection
+  function answerQuestion(qi, chosen, correct) {
+    // Only answer once per question
+    if (choices[qi] !== undefined) return;
+    choices[qi] = chosen;
+
+    // Highlight correct / wrong
+    const btns = document.querySelectorAll(`#opts-${qi} .opt-btn`);
+    btns.forEach(b => b.disabled = true);
+    btns[correct].classList.add('correct');
+    if (chosen !== correct) btns[chosen].classList.add('wrong');
+    else score++;
+
+    answered++;
+
+    // Show final score when all answered
+    if (answered === questions.length) showScore();
+  }
+
+  function showScore() {
+    const screen = document.getElementById('scoreScreen');
+    screen.style.display = 'block';
+    document.getElementById('scoreNum').innerHTML =
+      `${score}<span class="score-denom">/5</span>`;
+
+    const msgs = [
+      'Keep going — every lesson learned is a step forward.',
+      'A solid beginning — revisit the flashcards.',
+      'Good understanding forming.',
+      'Very well done indeed.',
+      'A perfect score — you have truly mastered this.'
+    ];
+    document.getElementById('scoreMsg').textContent = msgs[score] || msgs[0];
+    screen.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  /* ─────────────────────────────────────────
+     TAB SWITCHING
+  ───────────────────────────────────────── */
+  function switchTab(name, btn) {
+    // Deactivate all tabs and panels
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+    // Activate chosen
+    btn.classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+  }
+
+  /* ─────────────────────────────────────────
+     ENTER KEY SHORTCUT
+  ───────────────────────────────────────── */
+  document.getElementById('conceptInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') generate();
+  });
+
+</script>
+</body>
+</html>
